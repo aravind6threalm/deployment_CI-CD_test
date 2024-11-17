@@ -37,7 +37,7 @@ jobs:
       run: |
         # Define paths for msdeploy and dist folder
         $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"  # Ensure correct path with quotes
-        $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Ensure this path matches your build output folder
+        $distPath = "${{ github.workspace }}\dist\deployment_test\browser"  # Ensure this path matches your build output folder
 
         # Check if msdeploy.exe exists at the specified path
         if (-Not (Test-Path $msdeployPath)) {
