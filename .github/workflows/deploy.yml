@@ -36,7 +36,7 @@ jobs:
         IIS_SITE_NAME: ${{ secrets.IIS_SITE_NAME }}
       run: |
         # Define paths for msdeploy and dist folder
-        $msdeployPath = "'C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe'"
+        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
         $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Replace with your actual dist folder name
 
         # Run the msdeploy command to remove existing files and deploy the new build
