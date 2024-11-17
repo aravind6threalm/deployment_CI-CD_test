@@ -30,7 +30,7 @@ jobs:
       working-directory: ${{ github.workspace }}/deployment_test
 
     # Deploy to IIS using Web Deploy (no credentials needed)
-   - name: Deploy to IIS
+    - name: Deploy to IIS
       env:
         IIS_SERVER: ${{ secrets.IIS_SERVER }}
         IIS_SITE_NAME: ${{ secrets.IIS_SITE_NAME }}
