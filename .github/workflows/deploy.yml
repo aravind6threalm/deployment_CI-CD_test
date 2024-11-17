@@ -30,14 +30,31 @@ jobs:
       working-directory: ${{ github.workspace }}/deployment_test
 
     # Deploy to IIS using Web Deploy (no credentials needed)
-    - name: Deploy to IIS
+   - name: Deploy to IIS
       env:
         IIS_SERVER: ${{ secrets.IIS_SERVER }}
         IIS_SITE_NAME: ${{ secrets.IIS_SITE_NAME }}
       run: |
         # Define paths for msdeploy and dist folder
-        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
-        $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Replace with your actual dist folder name
+        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"  # Ensure correct path with quotes
+        $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Ensure this path matches your build output folder
 
-        # Run the msdeploy command to remove existing files and deploy the new build
-        Invoke-Expression "$msdeployPath -verb:sync -source:contentPath='$distPath' -dest:contentPath='$env:IIS_SITE_NAME',computerName='https://$env:IIS_SERVER:8172/msdeploy.axd' -delete -enableRule:DoNotDeleteRule"
+        # Check if msdeploy.exe exists at the specified path
+        if (-Not (Test-Path $msdeployPath)) {
+          Write-Host "msdeploy.exe not found. Please verify the installation path."
+          exit 1
+        }
+
+        # Check if dist folder exists
+        if (-Not (Test-Path $distPath)) {
+          Write-Host "The build folder '$distPath' was not found. Ensure the build was successful."
+          exit 1
+        }
+
+        # Deploy the build to IIS using msdeploy
+        Write-Host "Deploying to IIS server..."
+        # Ensure the path is correctly quoted if there are spaces
+        $msdeployCommand = "`"$msdeployPath`" -verb:sync -source:contentPath=`"$distPath`" -dest:contentPath=`"$env:IIS_SITE_NAME`",computerName=`"https://$env:IIS_SERVER:8172/msdeploy.axd`" -delete -enableRule:DoNotDeleteRule"
+        
+        # Run the msdeploy command
+        Invoke-Expression $msdeployCommand
