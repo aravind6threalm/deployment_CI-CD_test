@@ -28,14 +28,15 @@ jobs:
     - name: Build Angular App
       run: npm run build -- --configuration=production
 
-    # Deploy to IIS using Web Deploy
+    # Deploy to IIS using Web Deploy (no credentials needed)
     - name: Deploy to IIS
       env:
         IIS_SERVER: ${{ secrets.IIS_SERVER }}
-        IIS_USERNAME: ${{ secrets.IIS_USERNAME }}
-        IIS_PASSWORD: ${{ secrets.IIS_PASSWORD }}
         IIS_SITE_NAME: ${{ secrets.IIS_SITE_NAME }}
       run: |
-        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe" 
-        $distPath = "${{ github.workspace }}\dist\deployment_test\browser"
-        Invoke-Expression "$msdeployPath -verb:sync -source:contentPath='$distPath' -dest:contentPath='$env:IIS_SITE_NAME',computerName='https://$env:IIS_SERVER:8172/msdeploy.axd',userName='$env:IIS_USERNAME',password='$env:IIS_PASSWORD' -enableRule:DoNotDeleteRule"
+        # Define paths for msdeploy and dist folder
+        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+        $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Replace with your actual dist folder name
+
+        # Run the msdeploy command to remove existing files and deploy the new build
+        Invoke-Expression "$msdeployPath -verb:sync -source:contentPath='$distPath' -dest:contentPath='$env:IIS_SITE_NAME',computerName='https://$env:IIS_SERVER:8172/msdeploy.axd' -delete -enableRule:DoNotDeleteRule"
