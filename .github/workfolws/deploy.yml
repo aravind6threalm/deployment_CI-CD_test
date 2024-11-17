@@ -1,0 +1,42 @@
+name: Deploy Angular App to IIS
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Install Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16  # Use a compatible Node.js version
+
+    # Install dependencies
+    - name: Install Dependencies
+      run: npm install
+
+    # Build the Angular app
+    - name: Build Angular App
+      run: npm run build -- --configuration=production
+
+    # Deploy to IIS using Web Deploy (no credentials needed)
+    - name: Deploy to IIS
+      env:
+        IIS_SERVER: ${{ secrets.IIS_SERVER }}
+        IIS_SITE_NAME: ${{ secrets.IIS_SITE_NAME }}
+      run: |
+        # Define paths for msdeploy and dist folder
+        $msdeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+        $distPath = "${{ github.workspace }}\dist\MyAngularApp"  # Replace with your actual dist folder name
+
+        # Run the msdeploy command to remove existing files and deploy the new build
+        Invoke-Expression "$msdeployPath -verb:sync -source:contentPath='$distPath' -dest:contentPath='$env:IIS_SITE_NAME',computerName='https://$env:IIS_SERVER:8172/msdeploy.axd' -delete -enableRule:DoNotDeleteRule"
