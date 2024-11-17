@@ -27,6 +27,7 @@ jobs:
     # Build the Angular app
     - name: Build Angular App
       run: npm run build -- --configuration=production
+      working-directory: ${{ github.workspace }}/deployment_CI-CD_test/deployment_test
 
     # Deploy to IIS using Web Deploy (no credentials needed)
     - name: Deploy to IIS
